@@ -1,4 +1,4 @@
-package main.java.com.venuex.event_service.entities;
+package com.venuex.event_service.entities;
 
 import jakarta.persistence.*;
 
