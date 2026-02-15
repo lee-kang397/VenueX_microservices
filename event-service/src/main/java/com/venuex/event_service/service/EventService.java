@@ -164,15 +164,10 @@ public class EventService {
     }
 
 
-    public void addEventSeatSectionPrices(Integer eventId,
-        List<EventSeatSection> seatSections, Integer userId, String role) {
+    public void addEventSeatSectionPrices(Integer eventId, List<EventSeatSection> seatSections) {
 
         Event event = eventRepository.findById(eventId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found"));
-
-        if (!event.getCreatedByUserId().equals(userId) && !role.equals("ADMIN")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not correct user");
-        }
 
         List<EventSeatSection> existing = eventSeatSectionRepository.findByEvent_Id(eventId);
 
