@@ -2,12 +2,14 @@ package com.venuex.event_service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 @SpringBootApplication
-public class EventServiceApplication {
+@EnableDiscoveryClient
+public class VenueServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(EventServiceApplication.class, args);
+		SpringApplication.run(VenueServiceApplication.class, args);
 	}
 
 }
