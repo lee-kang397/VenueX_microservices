@@ -106,41 +106,38 @@ public class EventService {
             existingEvent.setName(newName);
         }
 
-    // Start Time
-    if (event.getStartTime() != null) {
+        // Start Time
+        if (event.getStartTime() != null) {
 
-        validateEventStartTime(event.getStartTime());
+            validateEventStartTime(event.getStartTime());
 
-        LocalDate eventDate = event.getStartTime().toLocalDate();
-        LocalDateTime dayStart = eventDate.atStartOfDay();
-        LocalDateTime dayEnd = eventDate.plusDays(1).atStartOfDay();
+            LocalDate eventDate = event.getStartTime().toLocalDate();
+            LocalDateTime dayStart = eventDate.atStartOfDay();
+            LocalDateTime dayEnd = eventDate.plusDays(1).atStartOfDay();
 
-        boolean conflict = eventRepository.existsEventOnDayExcludingEvent(
-            existingEvent.getVenueId(),
-            dayStart,
-            dayEnd,
-            id
-        );
-
-        if (conflict) {
-            throw new ResponseStatusException(
-                HttpStatus.CONFLICT,
-                "This venue already has a concert scheduled for that day"
+            boolean conflict = eventRepository.existsEventOnDayExcludingEvent(
+                existingEvent.getVenueId(),
+                dayStart,
+                dayEnd,
+                id
             );
+
+            if (conflict) {
+                throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,"This venue already has a concert scheduled for that day");
+            }
+
+            existingEvent.setStartTime(event.getStartTime());
         }
 
-        existingEvent.setStartTime(event.getStartTime());
+        if (event.getDescription() != null) {
+            existingEvent.setDescription(event.getDescription().toLowerCase());
+        }
+
+        Event updatedEvent = eventRepository.save(existingEvent);
+        updatedEvent.setStatus(eventStatus(id));
+        return convertToDTO(updatedEvent);
     }
-
-    if (event.getDescription() != null) {
-        existingEvent.setDescription(event.getDescription().toLowerCase());
-    }
-
-    Event updatedEvent = eventRepository.save(existingEvent);
-    updatedEvent.setStatus(eventStatus(id));
-
-    return convertToDTO(updatedEvent);
-}
 
 
     public void deleteEvent(Integer id, Integer userId, String role) {
