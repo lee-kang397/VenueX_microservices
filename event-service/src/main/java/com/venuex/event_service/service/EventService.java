@@ -12,8 +12,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.venuex.event_service.dto.EventDTO;
+import com.venuex.event_service.dto.VenueDTO;
 import com.venuex.event_service.entities.Event;
 import com.venuex.event_service.entities.EventSeatSection;
+import com.venuex.event_service.feinInt.VenueClient;
 import com.venuex.event_service.repository.EventRepository;
 import com.venuex.event_service.repository.EventSeatSectionRepository;
 
@@ -21,12 +23,15 @@ import com.venuex.event_service.repository.EventSeatSectionRepository;
 public class EventService {
     private final EventRepository eventRepository;
     private final EventSeatSectionRepository eventSeatSectionRepository;
+    private final VenueClient venueClient;
 
     public EventService(
         EventRepository eventRepository,
-        EventSeatSectionRepository eventSeatSectionRepository) {
+        EventSeatSectionRepository eventSeatSectionRepository, 
+        VenueClient venueClient) {
             this.eventRepository = eventRepository;
             this.eventSeatSectionRepository = eventSeatSectionRepository;
+            this.venueClient = venueClient;
     }
 
     public List<EventDTO> getEvents() {
@@ -139,7 +144,6 @@ public class EventService {
         return convertToDTO(updatedEvent);
     }
 
-
     public void deleteEvent(Integer id, Integer userId, String role) {
         Event existingEvent = eventRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found"));
@@ -185,7 +189,6 @@ public class EventService {
         eventSeatSectionRepository.saveAll(toSave);
     }
 
-
     public List<EventSeatSection> updateEventSeatSectionPrices(Integer eventId,
         List<EventSeatSection> eventSeatSections, Integer userId,String role) {
         Event event = eventRepository.findById(eventId)
@@ -220,9 +223,10 @@ public class EventService {
      /*================================================================================================= */
     /* Helpers */
     private EventDTO convertToDTO(Event event) {
+        VenueDTO venue = venueClient.getVenueById(event.getVenueId());
         return new EventDTO(
             event.getId(),
-            event.getVenueId(),
+            venue.getName(),
             event.getName(),
             event.getDescription(),
             event.getStartTime(),

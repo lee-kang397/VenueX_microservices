@@ -13,7 +13,7 @@ import com.venuex.event_service.service.EventService;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping("/api/events")
+@RequestMapping("/api")
 public class EventController {
 
     private final EventService eventService;
@@ -22,30 +22,30 @@ public class EventController {
         this.eventService = eventService;
     }
 
-    @GetMapping
+    @GetMapping("/events")
     public List<EventDTO> getEvents() {
         return eventService.getEvents();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/events/{id}")
     public EventDTO getEventById(@PathVariable Integer id) {
         return eventService.getEventById(id);
     }
 
-    @GetMapping("/host")
+    @GetMapping("host/events")
     public List<EventDTO> getEventByCreator(HttpServletRequest request) {
         Integer userId = (Integer) request.getAttribute("userId");
         return eventService.getEventByCreator(userId);
     }
 
-    @PostMapping("/host")
+    @PostMapping("/host/events")
     @ResponseStatus(HttpStatus.CREATED)
-    public EventDTO addEvent(@RequestBody Event event,HttpServletRequest request) {
+    public EventDTO addEvent(@RequestBody Event event, HttpServletRequest request) {
         Integer userId = (Integer) request.getAttribute("userId");
         return eventService.addEvent(event, userId);
     }
 
-    @PutMapping("/host/{id}")
+    @PutMapping("/host/events/{id}")
     @ResponseStatus(HttpStatus.OK)
     public EventDTO updateEvent(@PathVariable Integer id, @RequestBody Event event, HttpServletRequest request) {
         Integer userId = (Integer) request.getAttribute("userId");
@@ -54,7 +54,7 @@ public class EventController {
         return eventService.updateEvent(id, event, userId, role);
     }
 
-    @DeleteMapping("/host/{id}")
+    @DeleteMapping("/host/events/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteEvent(@PathVariable Integer id, HttpServletRequest request) {
         Integer userId = (Integer) request.getAttribute("userId");
@@ -67,12 +67,12 @@ public class EventController {
     /* EVENT SEAT SECTIONS */
     /* ============================= */
 
-    @GetMapping("/{id}/seat-sections")
+    @GetMapping("/events/{id}/event-seat-section")
     public List<EventSeatSection> getEventSeatById(@PathVariable Integer id) {
         return eventService.getEventSeatById(id);
     }
 
-    @PostMapping("/host/{id}/seat-sections")
+    @PostMapping("/host/events/{id}/event-seat-section")
     @ResponseStatus(HttpStatus.CREATED)
     public void addEventSeatSectionPrices(
             @PathVariable Integer id,
@@ -80,7 +80,7 @@ public class EventController {
         eventService.addEventSeatSectionPrices(id, seatSections);
     }
 
-    @PutMapping("/host/{id}/seat-sections")
+    @PutMapping("/host/events/{id}/event-seat-section")
     @ResponseStatus(HttpStatus.OK)
     public List<EventSeatSection> updateEventSeatSectionPrices(
             @PathVariable Integer id,

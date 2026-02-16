@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 public class EventDTO {
 
     private Integer id;
-    private Integer venueId;
+    private String venueName;
     private String name;
     private String description;
     private LocalDateTime startTime;
@@ -14,9 +14,9 @@ public class EventDTO {
     public EventDTO() {
     }
 
-    public EventDTO(Integer id,Integer venueId,String name,String description,LocalDateTime startTime,String status) {
+    public EventDTO(Integer id,String venueName,String name,String description,LocalDateTime startTime,String status) {
         this.id = id;
-        this.venueId = venueId;
+        this.venueName = venueName;
         this.name = name;
         this.description = description;
         this.startTime = startTime;
@@ -25,7 +25,7 @@ public class EventDTO {
 
     // Getters
     public Integer getId() { return id; }
-    public Integer getVenueId() { return venueId; }
+    public String getVenueName() { return venueName; }
     public String getName() { return name; }
     public String getDescription() { return description; }
     public LocalDateTime getStartTime() { return startTime; }
@@ -33,7 +33,7 @@ public class EventDTO {
 
     // Setters
     public void setId(Integer id) { this.id = id; }
-    public void setVenueId(Integer venueId) { this.venueId = venueId; }
+    public void setVenueName(String venueName) { this.venueName = venueName; }
     public void setName(String name) { this.name = name; }
     public void setDescription(String description) { this.description = description; }
     public void setStartTime(LocalDateTime startTime) { this.startTime = startTime; }
