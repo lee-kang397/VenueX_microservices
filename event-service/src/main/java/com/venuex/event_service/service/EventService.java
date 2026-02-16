@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.venuex.event_service.dto.EventDTO;
+import com.venuex.event_service.dto.EventSeatSectionDTO;
+import com.venuex.event_service.dto.SeatSectionDTO;
 import com.venuex.event_service.dto.VenueDTO;
 import com.venuex.event_service.entities.Event;
 import com.venuex.event_service.entities.EventSeatSection;
@@ -157,13 +160,25 @@ public class EventService {
     /*================================================================================================= */
     /* Event Seat Sections */
 
-    public List<EventSeatSection> getEventSeatById(Integer id) {
-        eventRepository.findById(id)
+    public List<EventSeatSectionDTO> getEventSeatById(Integer id) {
+        Event event = eventRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found"));
+        List<EventSeatSection> eventSections = eventSeatSectionRepository.findByEvent_Id(id);
+        List<SeatSectionDTO> venueSections = venueClient.getSeatSectionsByVenue(event.getVenueId());
+        Map<Integer, String> seatSectionNameMap = venueSections.stream()
+        .collect(Collectors.toMap(
+            SeatSectionDTO::getId,
+            SeatSectionDTO::getType
+        ));
 
-        return eventSeatSectionRepository.findByEvent_Id(id);
+        return eventSections.stream()
+        .map(section -> new EventSeatSectionDTO(
+            seatSectionNameMap.get(section.getSeatSectionId()),
+            section.getPrice(),
+            section.getRemainingCapacity()
+        ))
+        .collect(Collectors.toList());
     }
-
 
     public void addEventSeatSectionPrices(Integer eventId, List<EventSeatSection> seatSections) {
 
@@ -190,7 +205,7 @@ public class EventService {
     }
 
     public List<EventSeatSection> updateEventSeatSectionPrices(Integer eventId,
-        List<EventSeatSection> eventSeatSections, Integer userId,String role) {
+        List<EventSeatSectionDTO> seatSectionsDTO, Integer userId,String role) {
         Event event = eventRepository.findById(eventId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found"));
 
@@ -201,19 +216,6 @@ public class EventService {
         List<EventSeatSection> existingSections = eventSeatSectionRepository.findByEvent_Id(eventId);
         if (existingSections.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No seat sections exist for this event");
-        }
-
-        for (EventSeatSection dto : eventSeatSections) {
-            EventSeatSection existingSection = existingSections.stream()
-                .filter(ess -> ess.getSeatSectionId()
-                .equals(dto.getSeatSectionId()))
-                .findFirst()
-                .orElseThrow(() -> new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Seat section not found"));
-            if (dto.getPrice().compareTo(existingSection.getPrice()) > 0) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Cannot increase price");
-            }
-            existingSection.setPrice(dto.getPrice());
         }
 
         eventSeatSectionRepository.saveAll(existingSections);

@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import com.venuex.event_service.dto.EventDTO;
+import com.venuex.event_service.dto.EventSeatSectionDTO;
 import com.venuex.event_service.entities.Event;
 import com.venuex.event_service.entities.EventSeatSection;
 import com.venuex.event_service.service.EventService;
@@ -68,7 +69,7 @@ public class EventController {
     /* ============================= */
 
     @GetMapping("/events/{id}/event-seat-section")
-    public List<EventSeatSection> getEventSeatById(@PathVariable Integer id) {
+    public List<EventSeatSectionDTO> getEventSeatById(@PathVariable Integer id) {
         return eventService.getEventSeatById(id);
     }
 
@@ -84,7 +85,7 @@ public class EventController {
     @ResponseStatus(HttpStatus.OK)
     public List<EventSeatSection> updateEventSeatSectionPrices(
             @PathVariable Integer id,
-            @RequestBody List<EventSeatSection> seatSections,
+            @RequestBody List<EventSeatSectionDTO> seatSections,
             HttpServletRequest request) {
 
         Integer userId = (Integer) request.getAttribute("userId");
