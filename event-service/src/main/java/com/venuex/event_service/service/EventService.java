@@ -180,7 +180,7 @@ public class EventService {
         .collect(Collectors.toList());
     }
 
-    public void addEventSeatSectionPrices(Integer eventId, List<EventSeatSection> seatSections) {
+    public void addEventSeatSectionPrices(Integer eventId, List<EventSeatSectionDTO> seatSectionsDTO) {
 
         Event event = eventRepository.findById(eventId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found"));
@@ -191,20 +191,28 @@ public class EventService {
             throw new ResponseStatusException(HttpStatus.CONFLICT,"Event seat sections already set");
         }
 
+        List<SeatSectionDTO> venueSections = venueClient.getSeatSectionsByVenue(event.getVenueId());
+        Map<String, SeatSectionDTO> nameToSectionMap = venueSections.stream()
+            .collect(Collectors.toMap(SeatSectionDTO::getType, s -> s));
+
         List<EventSeatSection> toSave = new ArrayList<>();
 
-        for (EventSeatSection dto : seatSections) {
+        for (EventSeatSectionDTO dto : seatSectionsDTO) {
+
+            SeatSectionDTO venueSection = nameToSectionMap.get(dto.getSeatSectionName());
+
             EventSeatSection ess = new EventSeatSection();
             ess.setEvent(event);
-            ess.setSeatSectionId(dto.getSeatSectionId()); 
+            ess.setSeatSectionId(venueSection.getId());
             ess.setPrice(dto.getPrice());
-            ess.setRemainingCapacity(dto.getRemainingCapacity()); 
+            ess.setRemainingCapacity(venueSection.getCapacity());
+
             toSave.add(ess);
         }
         eventSeatSectionRepository.saveAll(toSave);
     }
 
-    public List<EventSeatSection> updateEventSeatSectionPrices(Integer eventId,
+    public List<EventSeatSectionDTO> updateEventSeatSectionPrices(Integer eventId,
         List<EventSeatSectionDTO> seatSectionsDTO, Integer userId,String role) {
         Event event = eventRepository.findById(eventId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found"));
@@ -218,8 +226,30 @@ public class EventService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No seat sections exist for this event");
         }
 
+        List<SeatSectionDTO> venueSections = venueClient.getSeatSectionsByVenue(event.getVenueId());
+        Map<Integer, String> idToTypeMap = venueSections.stream()
+            .collect(Collectors.toMap(SeatSectionDTO::getId, SeatSectionDTO::getType));
+        Map<String, EventSeatSection> typeToEventSectionMap = existingSections.stream()
+            .collect(Collectors.toMap(
+                ess -> idToTypeMap.get(ess.getSeatSectionId()),
+                ess -> ess));
+        for (EventSeatSectionDTO dto : seatSectionsDTO) {
+            EventSeatSection section = typeToEventSectionMap.get(dto.getSeatSectionName());
+
+            if (dto.getPrice().compareTo(section.getPrice()) > 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Cannot increase price");
+            }
+
+            section.setPrice(dto.getPrice());
+        }
         eventSeatSectionRepository.saveAll(existingSections);
-        return existingSections;
+        return existingSections.stream()
+            .map(section -> new EventSeatSectionDTO(
+                    idToTypeMap.get(section.getSeatSectionId()),
+                    section.getPrice(),
+                    section.getRemainingCapacity()
+            ))
+            .collect(Collectors.toList());
     }
 
      /*================================================================================================= */

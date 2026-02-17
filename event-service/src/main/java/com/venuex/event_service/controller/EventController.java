@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import com.venuex.event_service.dto.EventDTO;
 import com.venuex.event_service.dto.EventSeatSectionDTO;
 import com.venuex.event_service.entities.Event;
-import com.venuex.event_service.entities.EventSeatSection;
 import com.venuex.event_service.service.EventService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -77,13 +76,13 @@ public class EventController {
     @ResponseStatus(HttpStatus.CREATED)
     public void addEventSeatSectionPrices(
             @PathVariable Integer id,
-            @RequestBody List<EventSeatSection> seatSections) {
+            @RequestBody List<EventSeatSectionDTO> seatSections) {
         eventService.addEventSeatSectionPrices(id, seatSections);
     }
 
     @PutMapping("/host/events/{id}/event-seat-section")
     @ResponseStatus(HttpStatus.OK)
-    public List<EventSeatSection> updateEventSeatSectionPrices(
+    public List<EventSeatSectionDTO> updateEventSeatSectionPrices(
             @PathVariable Integer id,
             @RequestBody List<EventSeatSectionDTO> seatSections,
             HttpServletRequest request) {
