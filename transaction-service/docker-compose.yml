@@ -1,0 +1,15 @@
+services:
+  transaction-db:
+    image: postgres:16
+    container_name: transaction-db
+    environment:
+      POSTGRES_DB: venuex_transaction_service
+      POSTGRES_USER: transaction_user
+      POSTGRES_PASSWORD: transaction_pass
+    ports:
+      - "5434:5432"
+    volumes:
+      - transaction_db_data:/var/lib/postgresql/data
+
+volumes:
+  transaction_db_data:
