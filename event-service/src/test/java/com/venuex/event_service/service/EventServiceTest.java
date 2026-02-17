@@ -1,6 +1,5 @@
 package com.venuex.event_service.service;
 
-import com.venuex.event_service.dto.EventDTO;
 import com.venuex.event_service.dto.EventSeatSectionDTO;
 import com.venuex.event_service.dto.SeatSectionDTO;
 import com.venuex.event_service.entities.Event;
