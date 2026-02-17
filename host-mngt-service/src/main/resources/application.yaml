@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: host-mngt-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/vx-host-request-db
+    username: postgres
+    password: supersecretpassword
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true

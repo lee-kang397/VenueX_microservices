@@ -1,0 +1,44 @@
+server:
+  port: 8081  
+
+spring:
+  application:
+    name: venue-service   
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/venue_db
+    username: postgres
+    password: password
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: ERROR
+    org.springframework: ERROR
+    org.hibernate: ERROR
