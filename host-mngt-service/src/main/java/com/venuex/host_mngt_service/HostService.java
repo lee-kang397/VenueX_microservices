@@ -51,7 +51,7 @@ public class HostService {
 
         //see if another request already exists 
         boolean exists = hostRequestRepository
-            .existsByUserAndStatus(user, HostRequestStatus.PENDING);
+            .existsByUserIdAndStatus(userId, HostRequestStatus.PENDING);
 
         if (exists) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,"Host request already pending");
