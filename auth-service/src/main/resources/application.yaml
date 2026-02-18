@@ -2,10 +2,13 @@ server:
   port: 8084
 
 spring:
+  application:
+    name: auth-service 
+    
   datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
+    url: jdbc:postgresql://localhost:5432/user_db
+    username: postgres
+    password: password
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -26,6 +29,10 @@ app:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/ # server might not exist yet
+      defaultZone: http://localhost:8761/eureka/
     register-with-eureka: true
     fetch-registry: true
+
+  instance:
+    prefer-ip-address: true
+    ip-address: 127.0.0.1

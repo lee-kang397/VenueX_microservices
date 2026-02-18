@@ -35,7 +35,7 @@ public class AuthService {
         User newUser = userService.registerNewUser(registerRequest);
 
         // Generate the token
-        String token = jwtUtil.generateToken(newUser.getEmail(), "USER");
+        String token = jwtUtil.generateToken(newUser.getEmail(), "USER", newUser.getId());
 
         // Return the full response
         return new AuthResponse(newUser.getId(), token, "USER", newUser.getEmail(),
@@ -51,7 +51,7 @@ public class AuthService {
         }
 
         String primaryRole = getHighestRole(user);
-        String token = jwtUtil.generateToken(user.getEmail(), primaryRole);
+        String token = jwtUtil.generateToken(user.getEmail(), primaryRole, user.getId());
 
         return new AuthResponse(user.getId(), token, primaryRole, user.getEmail(), user.getFirstName(),
                 user.getLastName(), user.getPhone());

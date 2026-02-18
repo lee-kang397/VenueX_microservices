@@ -41,8 +41,9 @@ public class UserController {
     @GetMapping("/user/{id}")
     public ResponseEntity<UserResponseDTO> getUser(@PathVariable Integer id, HttpServletRequest request) {
         // Extract credentials from request attributes
-        String requesterEmail = (String) request.getAttribute("userEmail");
-        String requesterRole = (String) request.getAttribute("userRole");
+        String requesterEmail = request.getHeader("X-User-Email");
+        String requesterRole = request.getHeader("X-User-Role");
+
 
         // Pass these to the service so it can decide if the user is allowed to see this
         UserResponseDTO user = userService.getUserById(id, requesterEmail, requesterRole);
@@ -68,8 +69,9 @@ public class UserController {
             HttpServletRequest request) {
 
         // Get the identity of the person making the request
-        String requesterEmail = (String) request.getAttribute("userEmail");
-        String requesterRole = (String) request.getAttribute("userRole");
+        String requesterEmail = request.getHeader("X-User-Email");
+        String requesterRole = request.getHeader("X-User-Role");
+
 
         // Call the service to update the database
         User updatedUser = userService.updateUser(id, dto, requesterEmail, requesterRole);
@@ -80,7 +82,7 @@ public class UserController {
                 .findFirst()
                 .orElse("USER");
 
-        String newToken = jwtUtil.generateToken(updatedUser.getEmail(), primaryRole);
+        String newToken = jwtUtil.generateToken(updatedUser.getEmail(), primaryRole, updatedUser.getId());
 
         // Return the new token so the frontend can stay logged in
         return ResponseEntity.ok(new AuthResponse(updatedUser.getId(), newToken, primaryRole, updatedUser.getEmail(),
@@ -92,10 +94,10 @@ public class UserController {
     public ResponseEntity<String> updatePassword(
             @PathVariable Integer id,
             @RequestBody PasswordChangeRequest request,
-            HttpServletRequest httpRequest) {
+            HttpServletRequest HttpRequest) {
 
         // Get the email of the person currently logged in from the JWT filter
-        String requesterEmail = (String) httpRequest.getAttribute("userEmail");
+        String requesterEmail = HttpRequest.getHeader("X-User-Email");
 
         // Pass everything to the service
         userService.changePassword(id, request, requesterEmail);
@@ -107,8 +109,8 @@ public class UserController {
     @DeleteMapping("/user/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Integer id, HttpServletRequest request) {
         // Identify who is making the request
-        String requesterEmail = (String) request.getAttribute("userEmail");
-        String requesterRole = (String) request.getAttribute("userRole");
+        String requesterEmail = request.getHeader("X-User-Email");
+        String requesterRole = request.getHeader("X-User-Role");
 
         // Execute the deletion logic
         userService.deleteUser(id, requesterEmail, requesterRole);
