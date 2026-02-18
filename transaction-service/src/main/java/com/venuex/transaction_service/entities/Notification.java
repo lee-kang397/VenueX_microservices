@@ -44,7 +44,6 @@ public class Notification {
     @Column(name = "sent_at")
     private LocalDateTime sentAt;
 
-    // Constructors
     public Notification() {
     }
 
@@ -69,7 +68,6 @@ public class Notification {
         }
     }
 
-    // Getters & setters
     public Integer getId() {
         return id;
     }

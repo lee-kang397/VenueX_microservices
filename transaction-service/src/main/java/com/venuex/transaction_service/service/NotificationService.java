@@ -1,7 +1,6 @@
 package com.venuex.transaction_service.service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -9,70 +8,56 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.venuex.transaction_service.DTO.NotificationDTO;
 import com.venuex.transaction_service.entities.Notification;
+import com.venuex.transaction_service.feign.UserClient;
 import com.venuex.transaction_service.repository.NotificationRepository;
 
 @Service
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
+    private final UserClient userClient;
 
-    public NotificationService(NotificationRepository notificationRepository) {
+    public NotificationService(NotificationRepository notificationRepository, UserClient userClient) {
         this.notificationRepository = notificationRepository;
+        this.userClient = userClient;
     }
 
-    // ==============================
-    // GET NOTIFICATIONS BY BOOKING
-    // ==============================
-    public List<NotificationDTO> getNotificationsForBooking(Integer bookingId) {
-
-        return notificationRepository.findByBookingIdOrderByCreatedAtDesc(bookingId)
-                .stream()
-                .map(this::mapToDTO)
-                .collect(Collectors.toList());
-    }
-
-    // ==============================
-    // CREATE NOTIFICATION
-    // ==============================
-    public Notification createNotification(Integer bookingId, String message) {
-
-        if (bookingId == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Booking ID required");
-        }
-
-        if (message == null || message.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Message required");
-        }
-
-        Notification notification = new Notification();
-        notification.setBookingId(bookingId);
-        notification.setMessage(message);
-        notification.setStatus(Notification.NotificationStatus.PENDING);
-
-        return notificationRepository.save(notification);
-    }
-
-    // ==============================
-    // DELETE
-    // ==============================
-    public void deleteNotification(Integer id) {
-
-        Notification existing = notificationRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Notification not found"));
-
-        notificationRepository.delete(existing);
-    }
-
-    // ==============================
-    // MAPPER
-    // ==============================
-    private NotificationDTO mapToDTO(Notification n) {
+    private NotificationDTO toDto(Notification n, String userName) {
         return new NotificationDTO(
                 n.getId(),
-                n.getBookingId(),
+                userName,
                 n.getMessage(),
-                n.getStatus(),
-                n.getCreatedAt(),
-                n.getSentAt());
+                n.getSentAt() // or createdAt if your DTO uses that
+        );
+    }
+
+    public List<NotificationDTO> getUserNotifications(Integer userId) {
+        if (userId == null || userId <= 0) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing/invalid user id");
+        }
+
+        UserClient.UserResponse user = userClient.getUserById(userId);
+        String userName = user.fullName().isBlank() ? user.email() : user.fullName();
+
+        List<Notification> notifications = notificationRepository.findByUserIdOrderBySentAtDesc(userId);
+
+        return notifications.stream()
+                .map(n -> toDto(n, userName))
+                .toList();
+    }
+
+    public void deleteNotification(Integer notificationId, Integer userId) {
+        if (notificationId == null || notificationId <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid notification id");
+        }
+
+        Notification existing = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Notification not found"));
+
+        if (!existing.getUserId().equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not allowed");
+        }
+
+        notificationRepository.delete(existing);
     }
 }

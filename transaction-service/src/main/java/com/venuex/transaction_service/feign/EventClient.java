@@ -4,12 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-
-import com.venuex.transaction_service.DTO.EventDTO;
+import org.springframework.web.bind.annotation.*;
 
 @FeignClient(name = "event-service")
 public interface EventClient {
@@ -20,9 +15,10 @@ public interface EventClient {
     record EventReservationItem(String seatSectionType, int quantity) {
     }
 
+    record ReservedItem(String seatSectionType, int quantity, BigDecimal unitPrice) {
+    }
+
     record EventReservationResult(List<ReservedItem> items) {
-        public record ReservedItem(String seatSectionType, int quantity, BigDecimal unitPrice) {
-        }
     }
 
     @GetMapping("/api/events/{eventId}/summary")

@@ -66,8 +66,6 @@ public class Booking {
         }
     }
 
-    // Getters & Setters
-
     public Integer getId() {
         return id;
     }

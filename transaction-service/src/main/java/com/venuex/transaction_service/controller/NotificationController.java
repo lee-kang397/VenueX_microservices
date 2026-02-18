@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import com.venuex.transaction_service.DTO.NotificationDTO;
 import com.venuex.transaction_service.service.NotificationService;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @RestController
 @RequestMapping("/api")
 public class NotificationController {
@@ -18,23 +20,17 @@ public class NotificationController {
         this.notificationService = notificationService;
     }
 
-    // ==============================
-    // GET NOTIFICATIONS
-    // ==============================
-    @GetMapping("/user/bookings/{bookingId}/notifications")
+    @GetMapping("/user/notifications")
     @ResponseStatus(HttpStatus.OK)
-    public List<NotificationDTO> getNotifications(
-            @PathVariable Integer bookingId) {
-
-        return notificationService.getNotificationsForBooking(bookingId);
+    public List<NotificationDTO> getAllNotifications(HttpServletRequest request) {
+        Integer userId = (Integer) request.getAttribute("userId");
+        return notificationService.getUserNotifications(userId);
     }
 
-    // ==============================
-    // DELETE
-    // ==============================
     @DeleteMapping("/user/notifications/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteNotification(@PathVariable Integer id) {
-        notificationService.deleteNotification(id);
+    public void deleteNotification(@PathVariable Integer id, HttpServletRequest request) {
+        Integer userId = (Integer) request.getAttribute("userId");
+        notificationService.deleteNotification(id, userId);
     }
 }
