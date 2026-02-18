@@ -50,7 +50,7 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
 
             String email = claims.getSubject();
             String role = claims.get("role", String.class);
-            Integer userId = claims.get("userId", Integer.class);
+            Integer userId = claims.get("id", Integer.class);
 
             // Attach user info to downstream request
             ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
