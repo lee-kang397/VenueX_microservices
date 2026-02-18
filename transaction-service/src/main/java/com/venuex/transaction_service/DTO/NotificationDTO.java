@@ -2,27 +2,30 @@ package com.venuex.transaction_service.DTO;
 
 import java.time.LocalDateTime;
 
+import com.venuex.transaction_service.entities.Notification;
+
 public class NotificationDTO {
+
     private Integer id;
-    private Integer userId;
     private Integer bookingId;
-    private String type;
-    private String status;
     private String message;
+    private Notification.NotificationStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime sentAt;
 
     public NotificationDTO() {
     }
 
-    public NotificationDTO(Integer id, Integer userId, Integer bookingId, String type, String status,
-            String message, LocalDateTime createdAt, LocalDateTime sentAt) {
+    public NotificationDTO(Integer id,
+            Integer bookingId,
+            String message,
+            Notification.NotificationStatus status,
+            LocalDateTime createdAt,
+            LocalDateTime sentAt) {
         this.id = id;
-        this.userId = userId;
         this.bookingId = bookingId;
-        this.type = type;
-        this.status = status;
         this.message = message;
+        this.status = status;
         this.createdAt = createdAt;
         this.sentAt = sentAt;
     }
@@ -35,14 +38,6 @@ public class NotificationDTO {
         this.id = id;
     }
 
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
     public Integer getBookingId() {
         return bookingId;
     }
@@ -51,28 +46,20 @@ public class NotificationDTO {
         this.bookingId = bookingId;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
     public String getMessage() {
         return message;
     }
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public Notification.NotificationStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(Notification.NotificationStatus status) {
+        this.status = status;
     }
 
     public LocalDateTime getCreatedAt() {

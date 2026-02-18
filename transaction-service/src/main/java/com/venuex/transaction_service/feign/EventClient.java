@@ -21,7 +21,7 @@ public interface EventClient {
     }
 
     record EventReservationResult(List<ReservedItem> items) {
-        record ReservedItem(String seatSectionType, int quantity, BigDecimal unitPrice) {
+        public record ReservedItem(String seatSectionType, int quantity, BigDecimal unitPrice) {
         }
     }
 

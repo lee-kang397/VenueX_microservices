@@ -6,7 +6,9 @@ import com.venuex.transaction_service.entities.Booking;
 
 public interface BookingRepository extends JpaRepository<Booking, Integer> {
 
-    List<Booking> findByUserId(Integer userId);
+    // List<Booking> findByUserId(Integer userId);
+
+    List<Booking> findByUserIdOrderByBookedAtDesc(Integer userId);
 
     List<Booking> findByUserIdAndStatus(Integer userId, Booking.BookingStatus status);
 }

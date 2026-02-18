@@ -4,7 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
-@EnableFeignClients(basePackages = "com.venuex.transaction_service.service.client")
+@EnableFeignClients(basePackages = "com.venuex.transaction_service.feign")
 @SpringBootApplication
 public class TransactionServiceApplication {
 
