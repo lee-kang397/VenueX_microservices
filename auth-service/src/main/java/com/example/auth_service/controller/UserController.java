@@ -103,6 +103,16 @@ public class UserController {
         return ResponseEntity.ok("Password updated successfully");
     }
 
+    // UPDATE ROLE
+    @PatchMapping("/user/{id}/role")
+    public ResponseEntity<String> updateRole(
+            @PathVariable("id") Integer userId,
+            @RequestParam("role") String role) {
+        userService.addRole(userId, role);
+        return ResponseEntity.ok("Role updated successfully");
+    }
+
+
     // DELETE
     @DeleteMapping("/user/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Integer id, HttpServletRequest request) {
