@@ -1,0 +1,44 @@
+
+
+services:
+  authdb:
+    image: postgres:15
+    container_name: authdb
+    environment:
+      POSTGRES_DB: authdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password123
+    ports:
+      - "5433:5432"
+    volumes:
+      - authdb-data:/var/lib/postgresql/data
+    networks:
+      - auth-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  auth-service:
+    build: .
+    container_name: auth-service
+    ports:
+      - "8084:8084"
+    depends_on:
+      authdb:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://authdb:5432/authdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password123
+    networks:
+      - auth-network
+
+volumes:
+  authdb-data:
+
+networks:
+  auth-network:
+    driver: bridge
