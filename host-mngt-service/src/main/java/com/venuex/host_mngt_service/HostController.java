@@ -28,9 +28,9 @@ public class HostController {
     @PostMapping("/user/hosts/request")
     @ResponseStatus(HttpStatus.CREATED)
     public String createHostRequest(HttpServletRequest request) {
-        String hostEmail = (String) request.getAttribute("userEmail");
+        Integer hostId = (Integer) request.getAttribute("userId");
         String role = (String) request.getAttribute("userRole");
-        return hostService.createHostRequest(hostEmail,role);
+        return hostService.createHostRequest(hostId,role);
     }
 
     //ADMIN, get host requests 
@@ -45,27 +45,27 @@ public class HostController {
     @ResponseStatus(HttpStatus.OK)
     public void approveHostRequest(@PathVariable Integer id, HttpServletRequest request) {
 
-        String adminEmail = (String) request.getAttribute("userEmail");
+        Integer adminId = (Integer) request.getAttribute("userId");
         String role = (String) request.getAttribute("userRole");
 
-        hostService.approveHostRequest(id, adminEmail, role);
+        hostService.approveHostRequest(id, adminId, role);
     }
 
     @PutMapping("/admin/hosts/requests/{id}/deny")
     @ResponseStatus(HttpStatus.OK)
     public void denyHostRequest(@PathVariable Integer id, HttpServletRequest request) {
 
-        String adminEmail = (String) request.getAttribute("userEmail");
+        Integer adminId = (Integer) request.getAttribute("userId");
         String role = (String) request.getAttribute("userRole");
 
-        hostService.denyHostRequest(id, adminEmail, role); 
+        hostService.denyHostRequest(id, adminId, role); 
     }
 
     @DeleteMapping("/host/requests/{id}")
     @ResponseStatus(HttpStatus.OK) 
     public void deleteHostRequest(@PathVariable Integer id, HttpServletRequest request) {
-        String userEmail = (String) request.getAttribute("userEmail");
+        Integer userId = (Integer) request.getAttribute("userId");
         String role = (String) request.getAttribute("userRole");
-        hostService.deleteHostRequest(id,userEmail,role);
+        hostService.deleteHostRequest(id, userId, role);
     }
 }

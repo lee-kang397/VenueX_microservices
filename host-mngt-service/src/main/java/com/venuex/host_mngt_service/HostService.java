@@ -8,11 +8,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.venuex.host_mngt_service.HostRequest.HostRequestStatus;
-import com.venuex.host_mngt_service.notification.NotificationService;
-import com.venuex.host_mngt_service.user.Role;
-import com.venuex.host_mngt_service.user.RoleRepository;
-import com.venuex.host_mngt_service.user.User;
-import com.venuex.host_mngt_service.user.UserRepository;
+import com.venuex.host_mngt_service.notification.NotificationServiceClient;
+import com.venuex.host_mngt_service.user.UserResponseDTO;
+import com.venuex.host_mngt_service.user.UserServiceClient;
 
 import jakarta.transaction.Transactional;
 
@@ -20,38 +18,35 @@ import jakarta.transaction.Transactional;
 public class HostService {
 
     private final HostRequestRepository hostRequestRepository;
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
-    private final NotificationService notificationService;
+    private final UserServiceClient userServiceClient;
+    private final NotificationServiceClient notificationServiceClient;
 
     @Autowired
     public HostService(
         HostRequestRepository hostRequestRepository, 
-        UserRepository userRepository, 
-        RoleRepository roleRepository,
-        NotificationService notificationService) {
+        UserServiceClient userServiceClient, 
+        NotificationServiceClient notificationServiceClient) {
         this.hostRequestRepository = hostRequestRepository;
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.notificationService = notificationService;
+        this.userServiceClient = userServiceClient;
+        this.notificationServiceClient = notificationServiceClient;
     }
 
     //MAP TO DTO
     public HostRequestDTO mapToDTO(HostRequest hostRequest) {
         HostRequestDTO hostRequestDTO = new HostRequestDTO();
         hostRequestDTO.setId(hostRequest.getId());
-        hostRequestDTO.setUserId(hostRequest.getUser().getId());
+        hostRequestDTO.setUserId(hostRequest.getUserId());
         hostRequestDTO.setRequestedTime(hostRequest.getRequestedTime());
 
         return hostRequestDTO;
     }
 
     //CREATE
-    public String createHostRequest(String userEmail, String role) {
+    public String createHostRequest(Integer userId, String role) {
         if (!"USER".equals(role)) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not a user");
         }
-        User user = userRepository.findByEmail(userEmail)
+        UserResponseDTO user = userServiceClient.findById(userId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         //see if another request already exists 
@@ -62,16 +57,16 @@ public class HostService {
             throw new ResponseStatusException(HttpStatus.CONFLICT,"Host request already pending");
         }
         HostRequest newRequest = new HostRequest();
-        newRequest.setUser(user);
+        newRequest.setUserId(user.getId());
         newRequest.setStatus(HostRequestStatus.PENDING);
         hostRequestRepository.save(newRequest);
         return "SUBMITTED";
     }
  
-    //Get all host request 
+    //Get all host requests 
     public List<HostRequestDTO> getAllHostRequests(String role) {
         if (!"ADMIN".equals(role)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not a Admin");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not an Admin");
         }
         return hostRequestRepository.findAll()
             .stream()
@@ -80,12 +75,12 @@ public class HostService {
     }
 
     @Transactional
-    public void approveHostRequest(Integer requestId, String adminEmail, String role) {
-        User admin = userRepository.findByEmail(adminEmail)
+    public void approveHostRequest(Integer requestId, Integer adminId, String role) {
+        UserResponseDTO admin = userServiceClient.findById(adminId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Admin not found"));
 
         if (!"ADMIN".equals(role)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not a Admin");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not an Admin");
         }
 
         HostRequest request = hostRequestRepository.findById(requestId)
@@ -97,28 +92,27 @@ public class HostService {
 
         // Update request
         request.setStatus(HostRequestStatus.APPROVED);
-        request.setReviewedBy(admin);
+        request.setReviewedBy(admin.getId());
 
+        //!!! dont work rn, will fix !!!
         // Promote user to HOST
-        User user = request.getUser();
-        Role hostRole = roleRepository.findByRoleName("HOST")
-            .orElseThrow(() -> new RuntimeException("HOST role not found"));
-        user.getRoles().add(hostRole);
+        UserResponseDTO user = userServiceClient.findById(request.getUserId())
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         hostRequestRepository.save(request);
-        userRepository.save(user);
-        notificationService.createNotification(
+        userServiceClient.updateUserRole(request.getUserId(), "HOST");
+        notificationServiceClient.createNotification(
             user,
             "Congratulations, Your request to be a host has been approved!");
     }
 
     @Transactional
-    public void denyHostRequest(Integer requestId, String adminEmail, String role) {
-        User admin = userRepository.findByEmail(adminEmail)
+    public void denyHostRequest(Integer requestId, Integer adminId, String role) {
+        UserResponseDTO admin = userServiceClient.findById(adminId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Admin not found"));
 
         if (!"ADMIN".equals(role)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not a Admin");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not an Admin");
         }
 
         HostRequest request = hostRequestRepository.findById(requestId)
@@ -130,21 +124,22 @@ public class HostService {
 
         // Update request
         request.setStatus(HostRequestStatus.DENIED);
-        request.setReviewedBy(admin);
+        request.setReviewedBy(admin.getId());
         hostRequestRepository.save(request);
 
-        User user = request.getUser();
-        notificationService.createNotification(
+        UserResponseDTO user = userServiceClient.findById(request.getUserId())
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        notificationServiceClient.createNotification(
             user,
             "We apologize, Your request to be a host has been denied!");
     }
 
-    public void deleteHostRequest(Integer id, String userEmail, String role) {
+    public void deleteHostRequest(Integer id, Integer userId, String role) {
 
         HostRequest request = hostRequestRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Host request not found"));
 
-        boolean isCreator = request.getUser().getEmail().equals(userEmail);
+        boolean isCreator = request.getUserId().equals(userId);
         boolean isAdmin = role.equals("ADMIN");
         if (!isCreator && !isAdmin) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to delete this host request");
