@@ -17,7 +17,7 @@ public interface UserServiceClient {
     Optional<UserResponseDTO> findById(
         @PathVariable("id") Integer id);
 
-    // no endpoint
+    // endpoint implemented, untested
     @PatchMapping("/user/{id}/role")
     ResponseEntity<String> updateUserRole(
             @PathVariable("id") Integer userId,
