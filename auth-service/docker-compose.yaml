@@ -25,7 +25,7 @@ services:
     build: .
     container_name: auth-service
     ports:
-      - "8081:8081"
+      - "8084:8084"
     depends_on:
       authdb:
         condition: service_healthy
