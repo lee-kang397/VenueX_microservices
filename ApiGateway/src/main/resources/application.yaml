@@ -30,6 +30,11 @@ spring:
           uri: lb://auth-service
           predicates:
             - Path=/api/user/**,/api/admin/users/**
+        
+        - id: transaction-service
+          uri: lb://transaction-service
+          predicates:
+            - Path=/api/user/bookings/**,/api/user/notifications/**
 eureka:
   client:
     service-url:
