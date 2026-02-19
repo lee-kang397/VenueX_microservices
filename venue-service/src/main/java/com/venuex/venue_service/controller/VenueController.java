@@ -1,14 +1,16 @@
-package com.venuex.event_service.controller;
+package com.venuex.venue_service.controller;
 
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import com.venuex.venue_service.entities.SeatSection;
+import com.venuex.venue_service.entities.Venue;
+import com.venuex.venue_service.service.VenueService;
+
 import org.springframework.http.HttpStatus;
-import com.venuex.event_service.entities.SeatSection;
-import com.venuex.event_service.entities.Venue;
-import com.venuex.event_service.service.VenueService;
 
 import jakarta.servlet.http.HttpServletRequest;;
 

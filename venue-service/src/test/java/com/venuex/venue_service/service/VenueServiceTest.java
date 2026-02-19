@@ -1,9 +1,4 @@
-package com.venuex.event_service.service;
-
-import com.venuex.event_service.entities.SeatSection;
-import com.venuex.event_service.entities.Venue;
-import com.venuex.event_service.repository.SeatSectionRepository;
-import com.venuex.event_service.repository.VenueRepository;
+package com.venuex.venue_service.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,6 +7,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.server.ResponseStatusException;
+
+import com.venuex.venue_service.entities.SeatSection;
+import com.venuex.venue_service.entities.Venue;
+import com.venuex.venue_service.repository.SeatSectionRepository;
+import com.venuex.venue_service.repository.VenueRepository;
 
 import java.util.*;
 

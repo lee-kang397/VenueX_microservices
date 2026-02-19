@@ -2,6 +2,11 @@ server:
   port: 8081  
 
 spring:
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
   application:
     name: venue-service   
 
@@ -9,15 +14,11 @@ spring:
     url: jdbc:postgresql://localhost:5432/venue_db
     username: postgres
     password: password
+    driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: validate
-    show-sql: false
-    properties:
-      hibernate:
-        format_sql: true
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+      ddl-auto: update
 
 eureka:
   client:

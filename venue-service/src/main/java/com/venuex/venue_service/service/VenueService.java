@@ -1,16 +1,17 @@
-package com.venuex.event_service.service;
+package com.venuex.venue_service.service;
 
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.http.HttpStatus;
 
-import com.venuex.event_service.entities.SeatSection;
-import com.venuex.event_service.entities.Venue;
-import com.venuex.event_service.repository.SeatSectionRepository;
-import com.venuex.event_service.repository.VenueRepository;
+import com.venuex.venue_service.entities.SeatSection;
+import com.venuex.venue_service.entities.Venue;
+import com.venuex.venue_service.repository.SeatSectionRepository;
+import com.venuex.venue_service.repository.VenueRepository;
+
+import org.springframework.http.HttpStatus;
 
 @Service
 public class VenueService {

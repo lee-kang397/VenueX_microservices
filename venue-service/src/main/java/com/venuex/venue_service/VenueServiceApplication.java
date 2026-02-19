@@ -1,4 +1,4 @@
-package com.venuex.event_service;
+package com.venuex.venue_service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

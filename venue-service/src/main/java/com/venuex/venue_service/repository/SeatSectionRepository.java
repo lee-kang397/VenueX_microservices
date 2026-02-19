@@ -1,8 +1,8 @@
-package com.venuex.event_service.repository;
+package com.venuex.venue_service.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.venuex.event_service.entities.SeatSection;
+import com.venuex.venue_service.entities.SeatSection;
 
 import java.util.List;
 import java.util.Optional;

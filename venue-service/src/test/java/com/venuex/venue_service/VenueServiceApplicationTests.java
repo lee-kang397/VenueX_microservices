@@ -1,10 +1,10 @@
-package com.venuex.event_service;
+package com.venuex.venue_service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class EventServiceApplicationTests {
+class VenueServiceApplicationTests {
 
 	@Test
 	void contextLoads() {
