@@ -15,6 +15,6 @@ public interface VenueClient {
     @GetMapping("/api/venues/{id}")
     VenueDTO getVenueById(@PathVariable("id") Integer id);
 
-    @GetMapping("/venues/{venueId}/seat-sections")
+    @GetMapping("/api/venues/{venueId}/seat-sections")
     List<SeatSectionDTO> getSeatSectionsByVenue(@PathVariable Integer venueId);
 }

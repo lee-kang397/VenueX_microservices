@@ -1,0 +1,67 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: event-service
+          uri: lb://event-service
+          predicates:
+            - Path=/api/events/**,/api/host/events/**
+
+        - id: venue-service
+          uri: lb://venue-service
+          predicates:
+            - Path=/api/venues/**,/api/admin/venues/**
+
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/auth/**
+        
+        - id: user-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/user/**,/api/admin/users/**
+        
+        - id: transaction-service
+          uri: lb://transaction-service
+          predicates:
+            - Path=/api/user/bookings/**,/api/user/notifications/**
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+
+  instance:
+    prefer-ip-address: true
+    ip-address: 127.0.0.1
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: ERROR
+    org.springframework: ERROR
+    org.hibernate: ERROR
+
+app:
+  jwt:
+    secret: "our-very-secure-and-very-long-secret-key-at-least-32-chars-long"
+    expiration-ms: 86400000 # 24 hours
