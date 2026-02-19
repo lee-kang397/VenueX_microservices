@@ -34,22 +34,22 @@ public class EventController {
 
     @GetMapping("host/events")
     public List<EventDTO> getEventByCreator(HttpServletRequest request) {
-        Integer userId = (Integer) request.getAttribute("userId");
+        Integer userId = Integer.parseInt(request.getHeader("X-User-Id"));
         return eventService.getEventByCreator(userId);
     }
 
     @PostMapping("/host/events")
     @ResponseStatus(HttpStatus.CREATED)
     public EventDTO addEvent(@RequestBody Event event, HttpServletRequest request) {
-        Integer userId = (Integer) request.getAttribute("userId");
+        Integer userId = Integer.parseInt(request.getHeader("X-User-Id"));
         return eventService.addEvent(event, userId);
     }
 
     @PutMapping("/host/events/{id}")
     @ResponseStatus(HttpStatus.OK)
     public EventDTO updateEvent(@PathVariable Integer id, @RequestBody Event event, HttpServletRequest request) {
-        Integer userId = (Integer) request.getAttribute("userId");
-        String role = (String) request.getAttribute("userRole");
+        Integer userId = Integer.parseInt(request.getHeader("X-User-Id"));
+        String role = request.getHeader("X-User-Role");
 
         return eventService.updateEvent(id, event, userId, role);
     }
@@ -57,8 +57,8 @@ public class EventController {
     @DeleteMapping("/host/events/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteEvent(@PathVariable Integer id, HttpServletRequest request) {
-        Integer userId = (Integer) request.getAttribute("userId");
-        String role = (String) request.getAttribute("userRole");
+        Integer userId = Integer.parseInt(request.getHeader("X-User-Id"));
+        String role = request.getHeader("X-User-Role");
 
         eventService.deleteEvent(id, userId, role);
     }
@@ -87,8 +87,8 @@ public class EventController {
             @RequestBody List<EventSeatSectionDTO> seatSections,
             HttpServletRequest request) {
 
-        Integer userId = (Integer) request.getAttribute("userId");
-        String role = (String) request.getAttribute("userRole");
+        Integer userId = Integer.parseInt(request.getHeader("X-User-Id"));
+        String role = request.getHeader("X-User-Role");
 
         return eventService.updateEventSeatSectionPrices(id, seatSections, userId, role);
     }
