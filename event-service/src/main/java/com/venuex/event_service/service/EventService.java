@@ -212,7 +212,7 @@ public class EventService {
         eventSeatSectionRepository.saveAll(toSave);
     }
 
-    public List<EventSeatSectionDTO> updateEventSeatSectionPrices(Integer eventId,
+     public List<EventSeatSectionDTO> updateEventSeatSectionPrices(Integer eventId,
         List<EventSeatSectionDTO> seatSectionsDTO, Integer userId,String role) {
         Event event = eventRepository.findById(eventId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found"));

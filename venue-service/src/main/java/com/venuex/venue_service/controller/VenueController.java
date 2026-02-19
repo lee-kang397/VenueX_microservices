@@ -67,10 +67,6 @@ public class VenueController {
     //Seat Section Operations 
      @GetMapping("/venues/{venueId}/seat-sections")
     public List<SeatSection> getVenueSeatSections(@PathVariable Integer venueId, HttpServletRequest request) {
-        String requesterRole = request.getHeader("X-User-Role");
-        if (!requesterRole.equals("ADMIN")) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-        }
         return venueService.getVenueSeatSections(venueId);
     }
 
