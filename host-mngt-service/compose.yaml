@@ -39,4 +39,4 @@ volumes:
 
 networks:
   host-network:
-    driver: bridge
+    external: true
