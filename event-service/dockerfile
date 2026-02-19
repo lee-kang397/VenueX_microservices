@@ -1,14 +1,24 @@
-# 1. Use a base image with the correct JDK
-FROM eclipse-temurin:21-jdk-alpine
+FROM eclipse-temurin:21-jdk-alpine AS build
 
-# 2. Set the working directory in the container
 WORKDIR /app
 
-# 3. Copy the built JAR into the container
-COPY target/event-service-0.0.1-SNAPSHOT.jar app.jar
+COPY mvnw .
+COPY .mvn/ .mvn/
+COPY pom.xml .
 
-# 4. Expose the port your Spring Boot app runs on inside the container
+COPY src/ src/
+
+RUN chmod +x mvnw
+
+RUN ./mvnw clean package -DskipTests
+
+FROM eclipse-temurin:21-jdk-alpine
+
+WORKDIR /app
+
+COPY --from=build /app/target/*.jar app.jar
+
+
 EXPOSE 8080
 
-# 5. Run the JAR
 ENTRYPOINT ["java", "-jar", "app.jar"]
