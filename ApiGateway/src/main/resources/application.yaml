@@ -19,7 +19,7 @@ spring:
         - id: venue-service
           uri: lb://venue-service
           predicates:
-            - Path=/api/venues/**,/api/admin/venues/**
+            - Path=/api/venues,/api/venues/**,/api/admin/venues/**
 
         - id: auth-service
           uri: lb://auth-service
@@ -35,16 +35,17 @@ spring:
           uri: lb://transaction-service
           predicates:
             - Path=/api/user/bookings/**,/api/user/notifications/**
+        
+        - id: host-mgnt-service
+          uri: lb://host-mgnt-service
+          predicates:
+            - Path=/api/user/hosts/**,/api/admin/hosts/**,/api/host/requests/**
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://eureka-server:8761/eureka/
     register-with-eureka: true
     fetch-registry: true
-
-  instance:
-    prefer-ip-address: true
-    ip-address: 127.0.0.1
 
 management:
   endpoints:

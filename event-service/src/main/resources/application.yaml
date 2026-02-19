@@ -1,5 +1,5 @@
 server:
-  port: 8082  
+  port: 8082
 
 spring:
   flyway:
@@ -9,7 +9,7 @@ spring:
 
   application:
     name: event-service   
-
+ 
   datasource:
     url: jdbc:postgresql://event-db:5432/event_db
     username: event_user
@@ -22,11 +22,9 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://eureka-server:8761/eureka/
     register-with-eureka: true
     fetch-registry: true
-  instance:
-    prefer-ip-address: true
     
 management:
   endpoints:

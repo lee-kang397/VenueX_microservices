@@ -1,0 +1,42 @@
+services:
+  # -------------------
+  # Venue DB
+  # -------------------
+  venue-db:
+    image: postgres:15
+    container_name: venue-db
+    environment:
+      POSTGRES_DB: venue_db
+      POSTGRES_USER: venue_user
+      POSTGRES_PASSWORD: venue_pass
+    ports:
+      - "15432:5432"
+    volumes:
+      - venue_data:/var/lib/postgresql/data
+    networks:
+      - networkName
+
+  # -------------------
+  # Venue Service
+  # -------------------
+  venue-service:
+    build: .
+    container_name: venue-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://venue-db:5432/venue_db
+      SPRING_DATASOURCE_USERNAME: venue_user
+      SPRING_DATASOURCE_PASSWORD: venue_pass
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      - venue-db
+    ports:
+      - "8081:8081"
+    networks:
+      - networkName
+
+networks:
+  networkName:
+    external: true
+
+volumes:
+  venue_data:

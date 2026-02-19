@@ -1,0 +1,43 @@
+
+services:
+  # -------------------
+  # Event DB
+  # -------------------
+  event-db:
+    image: postgres:15
+    container_name: event-db
+    environment:
+      POSTGRES_DB: event_db
+      POSTGRES_USER: event_user
+      POSTGRES_PASSWORD: event_pass
+    ports:
+      - "15433:5432"
+    volumes:
+      - event_data:/var/lib/postgresql/data
+    networks:
+      - networkName
+
+  # -------------------
+  # Event Service
+  # -------------------
+  event-service:
+    build: .
+    container_name: event-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://event-db:5432/event_db
+      SPRING_DATASOURCE_USERNAME: event_user
+      SPRING_DATASOURCE_PASSWORD: event_pass
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      - event-db
+    ports:
+      - "8082:8082"
+    networks:
+      - networkName
+
+networks:
+  networkName:
+    external: true
+  
+volumes:
+  event_data:

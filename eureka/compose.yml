@@ -1,0 +1,12 @@
+services:
+  eureka-server:
+    build:
+      context: .
+    ports:
+      - 8761:8761
+    networks:
+      - networkName
+
+networks:
+  networkName:
+    external: true
