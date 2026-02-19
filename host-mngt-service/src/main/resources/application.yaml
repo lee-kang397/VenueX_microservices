@@ -5,9 +5,9 @@ spring:
   application:
     name: host-request-service
   datasource:
-    url: jdbc:postgresql://postgres:5432/hostdb
-    username: hostuser
-    password: hostpass
+    url: jdbc:postgresql://localhost:5432/vx_hr_db
+    username: postgres
+    password: postgres
 
 jpa:
   hibernate:
@@ -25,7 +25,7 @@ flyway:
 eureka:
   client:
     service-url:
-      defaultZone: http://eureka-server:8761/eureka # server might not exist yet
+      defaultZone: http://localhost:8761/eureka # server might not exist yet
     register-with-eureka: true
     fetch-registry: true
   instance:
