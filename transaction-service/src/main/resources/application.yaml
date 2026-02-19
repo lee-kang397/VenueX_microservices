@@ -6,9 +6,9 @@ spring:
     name: transaction-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/venuex_transaction_service
-    username: transaction_user
-    password: transaction_pass
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/venuex_transaction_service}
+    username: ${SPRING_DATASOURCE_USERNAME:transaction_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:transaction_pass}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -25,7 +25,7 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+       defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
     register-with-eureka: true
     fetch-registry: true
 

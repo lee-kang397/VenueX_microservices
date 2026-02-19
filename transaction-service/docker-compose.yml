@@ -1,15 +1,20 @@
 services:
-  transaction-db:
-    image: postgres:16
-    container_name: transaction-db
-    environment:
-      POSTGRES_DB: venuex_transaction_service
-      POSTGRES_USER: transaction_user
-      POSTGRES_PASSWORD: transaction_pass
+  transaction-service:
+    build: .
+    container_name: transaction-service
     ports:
-      - "5434:5432"
-    volumes:
-      - transaction_db_data:/var/lib/postgresql/data
+      - "8083:8083"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://transaction-db:5432/venuex_transaction_service
+      SPRING_DATASOURCE_USERNAME: transaction_user
+      SPRING_DATASOURCE_PASSWORD: transaction_pass
 
-volumes:
-  transaction_db_data:
+      # IMPORTANT: set this to your Eureka container name + port
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+
+    networks:
+      - host-network
+
+networks:
+  host-network:
+    external: true
