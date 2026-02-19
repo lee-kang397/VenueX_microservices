@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.venuex.transaction_service.DTO.BookingDTO;
 import com.venuex.transaction_service.DTO.TicketDTO;
@@ -26,6 +27,26 @@ public class BookingController {
                 this.ticketService = ticketService;
         }
 
+        private Integer requireUserId(HttpServletRequest request) {
+                String userIdHeader = request.getHeader("X-User-Id");
+                if (userIdHeader == null || userIdHeader.isBlank()) {
+                        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing X-User-Id header");
+                }
+                try {
+                        return Integer.parseInt(userIdHeader);
+                } catch (NumberFormatException e) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid X-User-Id header");
+                }
+        }
+
+        private String requireUserEmail(HttpServletRequest request) {
+                String userEmailHeader = request.getHeader("X-User-Email");
+                if (userEmailHeader == null || userEmailHeader.isBlank()) {
+                        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing X-User-Email header");
+                }
+                return userEmailHeader;
+        }
+
         // Create a new booking
         // POST /api/user/bookings?eventId=123
         @PostMapping("/user/bookings")
@@ -33,18 +54,18 @@ public class BookingController {
                         @RequestParam Integer eventId,
                         HttpServletRequest request) {
 
-                Integer userId = (Integer) request.getAttribute("userId");
-                String userEmail = (String) request.getAttribute("userEmail"); // optional snapshot
+                Integer userId = requireUserId(request);
+                String userEmail = requireUserEmail(request);
 
                 Integer bookingId = bookingService.createBooking(eventId, userId, userEmail);
-                return ResponseEntity.status(HttpStatus.CREATED).body(bookingId);
+                return ResponseEntity.ok(bookingId);
         }
 
         // Get all bookings for a user
         // GET /api/user/bookings
         @GetMapping("/user/bookings")
         public ResponseEntity<List<BookingDTO>> getUserBookings(HttpServletRequest request) {
-                Integer userId = (Integer) request.getAttribute("userId");
+                Integer userId = requireUserId(request);
                 return ResponseEntity.ok(bookingService.getUserBookings(userId));
         }
 
@@ -56,7 +77,7 @@ public class BookingController {
                         @RequestBody List<TicketDTO> tickets,
                         HttpServletRequest request) {
 
-                Integer userId = (Integer) request.getAttribute("userId");
+                Integer userId = requireUserId(request);
                 BookingDTO bookingDTO = ticketService.addTicketsToBooking(bookingId, tickets, userId);
                 return ResponseEntity.ok(bookingDTO);
         }
@@ -68,7 +89,7 @@ public class BookingController {
                         @PathVariable Integer bookingId,
                         HttpServletRequest request) {
 
-                Integer userId = (Integer) request.getAttribute("userId");
+                Integer userId = requireUserId(request);
                 return ResponseEntity.ok(ticketService.getTicketsForBooking(bookingId, userId));
         }
 
@@ -79,7 +100,7 @@ public class BookingController {
                         @PathVariable Integer bookingId,
                         HttpServletRequest request) {
 
-                Integer userId = (Integer) request.getAttribute("userId");
+                Integer userId = requireUserId(request);
                 return ResponseEntity.ok(ticketService.mockPay(bookingId, userId));
         }
 }
