@@ -1,0 +1,67 @@
+version: "3.9"
+services:
+  # -------------------
+  # Venue DB
+  # -------------------
+  venue-db:
+    image: postgres:15
+    container_name: venue-db
+    environment:
+      POSTGRES_DB: venue_db
+      POSTGRES_USER: venue_user
+      POSTGRES_PASSWORD: venue_pass
+    # Internal port is always 5432 for postgres
+    # Host port mapping optional, change if teammates conflict
+    ports:
+      - "15432:5432"  # host_port:container_port, unique for your machine
+    volumes:
+      - venue_data:/var/lib/postgresql/data
+
+  # -------------------
+  # Venue Service
+  # -------------------
+  venue-service:
+    build: ./venue-service
+    container_name: venue-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://venue-db:5432/venue_db
+      SPRING_DATASOURCE_USERNAME: venue_user
+      SPRING_DATASOURCE_PASSWORD: venue_pass
+    depends_on:
+      - venue-db
+    ports:
+      - "8081:8080"
+
+  # -------------------
+  # Event DB
+  # -------------------
+  event-db:
+    image: postgres:15
+    container_name: event-db
+    environment:
+      POSTGRES_DB: event_db
+      POSTGRES_USER: event_user
+      POSTGRES_PASSWORD: event_pass
+    ports:
+      - "15433:5432"  # host port unique for local connections
+    volumes:
+      - event_data:/var/lib/postgresql/data
+
+  # -------------------
+  # Event Service
+  # -------------------
+  event-service:
+    build: ./event-service
+    container_name: event-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://event-db:5432/event_db
+      SPRING_DATASOURCE_USERNAME: event_user
+      SPRING_DATASOURCE_PASSWORD: event_pass
+    depends_on:
+      - event-db
+    ports:
+      - "8082:8080"
+
+volumes:
+  venue_data:
+  event_data:

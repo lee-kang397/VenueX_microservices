@@ -11,9 +11,9 @@ spring:
     name: venue-service   
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/venue_db
-    username: postgres
-    password: password
+    url: jdbc:postgresql://venue-db:5432/venue_db
+    username: venue_user
+    password: venue_pass
     driver-class-name: org.postgresql.Driver
 
   jpa:

@@ -11,9 +11,9 @@ spring:
     name: event-service   
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/event_db
-    username: postgres
-    password: password
+    url: jdbc:postgresql://event-db:5432/event_db
+    username: event_user
+    password: event_pass
 
   jpa:
     hibernate:
