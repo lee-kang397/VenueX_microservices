@@ -1,0 +1,42 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: host-request-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: hostdb
+      POSTGRES_USER: hostuser
+      POSTGRES_PASSWORD: hostpass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    networks:
+      - host-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hostuser -d hostdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  host-request-service:
+    build: .
+    container_name: host-request-service
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8085:8085"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/hostdb
+      SPRING_DATASOURCE_USERNAME: hostuser
+      SPRING_DATASOURCE_PASSWORD: hostpass
+    networks:
+      - host-network
+
+volumes:
+  postgres_data:
+
+networks:
+  host-network:
+    external: true

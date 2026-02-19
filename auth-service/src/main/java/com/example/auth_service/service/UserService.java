@@ -3,7 +3,6 @@ package com.example.auth_service.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 import com.example.auth_service.DTOs.UserResponseDTO;
 import com.example.auth_service.controller.request.PasswordChangeRequest;
 import com.example.auth_service.controller.request.RegisterRequest;
@@ -164,6 +163,18 @@ public class UserService {
 
         // Encode the new password and save
         user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+    }
+
+    // UPDATE ROLE
+    public void addRole(Integer id, String roleName) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Role role = roleRepository.findByRoleName(roleName)
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+
+        if(!user.getRoles().contains(role))
+                user.getRoles().add(role);
         userRepository.save(user);
     }
 
